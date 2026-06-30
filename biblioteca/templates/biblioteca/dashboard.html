@@ -1,75 +1,95 @@
 {% extends 'biblioteca/base.html' %}
 
-{% block title %}Inicio - LibSistema{% endblock %}
+{% block title %}Dashboard - BiblioTech{% endblock %}
 
 {% block content %}
-<div class="section-header">
-    <h1 class="section-title">Resumen de la Biblioteca</h1>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Resumen de la Biblioteca</h1>
+    <p class="text-sm text-gray-500 mt-1">Monitorea y administra el inventario, préstamos y miembros activos.</p>
 </div>
 
-<div class="dashboard-grid">
-    <div class="stat-card">
-        <div class="stat-icon">📚</div>
-        <div class="stat-info">
-            <h3>Libros en Catálogo</h3>
-            <p>{{ total_libros }}</p>
+<!-- Metrics Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Stat Card 1 -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-150 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+            <span class="material-symbols-outlined text-2xl">library_books</span>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Libros en Catálogo</p>
+            <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ total_libros }}</h3>
         </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-info">
-            <h3>Miembros Activos</h3>
-            <p>{{ total_miembros }}</p>
+    <!-- Stat Card 2 -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-150 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="p-3 bg-green-50 rounded-xl text-green-600">
+            <span class="material-symbols-outlined text-2xl">group</span>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Miembros Activos</p>
+            <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ total_miembros }}</h3>
         </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon">🔄</div>
-        <div class="stat-info">
-            <h3>Préstamos en Curso</h3>
-            <p>{{ total_prestamos_activos }}</p>
+    <!-- Stat Card 3 -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-150 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+            <span class="material-symbols-outlined text-2xl">autorenew</span>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Préstamos en Curso</p>
+            <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ total_prestamos_activos }}</h3>
         </div>
     </div>
-    <div class="stat-card" style="{% if total_vencidos > 0 %}border-color: var(--danger);{% endif %}">
-        <div class="stat-icon">⚠️</div>
-        <div class="stat-info">
-            <h3>Préstamos Vencidos</h3>
-            <p style="{% if total_vencidos > 0 %}color: var(--danger);{% endif %}">{{ total_vencidos }}</p>
+    <!-- Stat Card 4 -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-150 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow {% if total_vencidos > 0 %} border-red-200 bg-red-50/10 {% endif %}">
+        <div class="p-3 {% if total_vencidos > 0 %} bg-red-100 text-red-600 {% else %} bg-gray-100 text-gray-500 {% endif %} rounded-xl">
+            <span class="material-symbols-outlined text-2xl">warning</span>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Préstamos Vencidos</p>
+            <h3 class="text-2xl font-bold {% if total_vencidos > 0 %} text-red-600 {% else %} text-gray-900 {% endif %} mt-1">{{ total_vencidos }}</h3>
         </div>
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(45%, 1fr)); gap: 2rem;">
-    <!-- Últimos Préstamos -->
-    <div class="card-section">
-        <div class="section-header">
-            <h2 class="section-title">Últimas Transacciones</h2>
-            <a href="{% url 'prestamo_list' %}" class="btn btn-secondary btn-sm">Ver Todos</a>
+<!-- Two-Column Grid for Data Tables -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Transactions Card -->
+    <div class="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-gray-150 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-gray-950">Últimas Transacciones</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Últimos préstamos registrados en el sistema.</p>
+            </div>
+            <a href="{% url 'prestamo_list' %}" class="px-4 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-xs font-semibold rounded-lg text-gray-700 transition-colors">
+                Ver Todos
+            </a>
         </div>
-        <div class="table-responsive">
-            <table>
-                <thead>
+        <div class="overflow-x-auto flex-1">
+            <table class="w-full text-sm text-left text-gray-600">
+                <thead class="text-xs text-gray-700 bg-gray-50/80 border-b border-gray-150">
                     <tr>
-                        <th>Libro</th>
-                        <th>Miembro</th>
-                        <th>Vence</th>
-                        <th>Estado</th>
+                        <th class="px-6 py-4 font-semibold">Libro</th>
+                        <th class="px-6 py-4 font-semibold">Miembro</th>
+                        <th class="px-6 py-4 font-semibold">Vence</th>
+                        <th class="px-6 py-4 font-semibold">Estado</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-gray-100">
                     {% for prestamo in ultimos_prestamos %}
-                    <tr>
-                        <td><strong>{{ prestamo.libro.titulo }}</strong></td>
-                        <td>{{ prestamo.miembro.nombre_completo }}</td>
-                        <td>{{ prestamo.fecha_vence|date:"d/m/Y" }}</td>
-                        <td>
-                            <span class="badge badge-{{ prestamo.estado_transaccion|lower }}">
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4 font-semibold text-gray-900">{{ prestamo.libro.titulo }}</td>
+                        <td class="px-6 py-4">{{ prestamo.miembro.nombre_completo }}</td>
+                        <td class="px-6 py-4 text-xs">{{ prestamo.fecha_vence|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if prestamo.estado_transaccion == 'Devuelto' %} bg-green-50 text-green-800 {% elif prestamo.estado_transaccion == 'Pagado' %} bg-blue-50 text-blue-800 {% elif prestamo.estado_transaccion == 'Vencido' %} bg-red-50 text-red-800 {% else %} bg-yellow-50 text-yellow-800 {% endif %}">
                                 {{ prestamo.estado_transaccion }}
                             </span>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" style="text-align: center;">No hay transacciones registradas.</td>
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">No hay transacciones registradas.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -77,37 +97,45 @@
         </div>
     </div>
 
-    <!-- Stock Crítico -->
-    <div class="card-section">
-        <div class="section-header">
-            <h2 class="section-title">Stock Alerta / Crítico</h2>
-            <a href="{% url 'libro_list' %}" class="btn btn-secondary btn-sm">Gestionar Catálogo</a>
+    <!-- Critical Stock Alert Card -->
+    <div class="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-gray-150 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-gray-950">Stock en Alerta</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Libros con pocas unidades disponibles para préstamo.</p>
+            </div>
+            <a href="{% url 'libro_list' %}" class="px-4 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-xs font-semibold rounded-lg text-gray-700 transition-colors">
+                Ver Catálogo
+            </a>
         </div>
-        <div class="table-responsive">
-            <table>
-                <thead>
+        <div class="overflow-x-auto flex-1">
+            <table class="w-full text-sm text-left text-gray-600">
+                <thead class="text-xs text-gray-700 bg-gray-50/80 border-b border-gray-150">
                     <tr>
-                        <th>Libro</th>
-                        <th>Disponibles</th>
-                        <th>Estado</th>
+                        <th class="px-6 py-4 font-semibold">Libro</th>
+                        <th class="px-6 py-4 font-semibold">Disponibilidad</th>
+                        <th class="px-6 py-4 font-semibold">Estado</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-gray-100">
                     {% for libro in libros_criticos %}
-                    <tr>
-                        <td><strong>{{ libro.titulo }}</strong><br><small>{{ libro.autor }}</small></td>
-                        <td>{{ libro.ejemplares_disponibles }} de {{ libro.cantidad_total }}</td>
-                        <td>
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="font-semibold text-gray-900 block">{{ libro.titulo }}</span>
+                            <span class="text-xs text-gray-500">{{ libro.autor }}</span>
+                        </td>
+                        <td class="px-6 py-4">{{ libro.ejemplares_disponibles }} de {{ libro.cantidad_total }}</td>
+                        <td class="px-6 py-4">
                             {% if libro.ejemplares_disponibles == 0 %}
-                            <span class="badge badge-nostock">Agotado</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Agotado</span>
                             {% else %}
-                            <span class="badge badge-pendiente">Stock Bajo</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-850">Stock Bajo</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3" style="text-align: center; color: var(--success);">¡Todos los libros tienen buen stock!</td>
+                        <td colspan="3" class="px-6 py-8 text-center text-green-600 font-medium">¡Todos los libros tienen buen stock disponible!</td>
                     </tr>
                     {% endfor %}
                 </tbody>

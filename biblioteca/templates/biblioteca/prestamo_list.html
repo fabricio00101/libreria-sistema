@@ -1,73 +1,85 @@
 {% extends 'biblioteca/base.html' %}
 
-{% block title %}Transacciones de Préstamos - LibSistema{% endblock %}
+{% block title %}Préstamos - BiblioTech{% endblock %}
 
 {% block content %}
-<div class="card-section">
-    <div class="section-header">
-        <h1 class="section-title">Registro de Préstamos</h1>
-        <a href="{% url 'prestamo_create' %}" class="btn btn-primary">➕ Registrar Préstamo</a>
+<div class="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-gray-150 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-950">Registro de Préstamos</h1>
+            <p class="text-sm text-gray-500 mt-1">Sigue el estado de salidas, devoluciones, cargos y moras.</p>
+        </div>
+        <a href="{% url 'prestamo_create' %}" class="px-4 py-2 bg-primary hover:bg-blue-800 text-white text-sm font-semibold rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-sm">add</span>
+            Registrar Préstamo
+        </a>
     </div>
     
-    <div class="table-responsive">
-        <table>
-            <thead>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-600">
+            <thead class="text-xs text-gray-700 bg-gray-50/80 border-b border-gray-150 uppercase tracking-wider">
                 <tr>
-                    <th>ID</th>
-                    <th>Miembro</th>
-                    <th>Libro</th>
-                    <th>Fecha Salida</th>
-                    <th>Fecha Vence</th>
-                    <th>Fecha Devolución</th>
-                    <th>Días Mora</th>
-                    <th>Costo</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                    <th class="px-6 py-4 font-semibold">ID</th>
+                    <th class="px-6 py-4 font-semibold">Miembro</th>
+                    <th class="px-6 py-4 font-semibold">Libro</th>
+                    <th class="px-6 py-4 font-semibold">Salida</th>
+                    <th class="px-6 py-4 font-semibold">Vencimiento</th>
+                    <th class="px-6 py-4 font-semibold">Devolución</th>
+                    <th class="px-6 py-4 font-semibold">Mora</th>
+                    <th class="px-6 py-4 font-semibold">Costo</th>
+                    <th class="px-6 py-4 font-semibold">Estado</th>
+                    <th class="px-6 py-4 font-semibold text-right">Acciones</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-150">
                 {% for prestamo in prestamos %}
-                <tr>
-                    <td><code>#{{ prestamo.prestamo_id }}</code></td>
-                    <td><strong>{{ prestamo.miembro.nombre_completo }}</strong></td>
-                    <td>{{ prestamo.libro.titulo }}</td>
-                    <td>{{ prestamo.fecha_salida|date:"d/m/Y" }}</td>
-                    <td>{{ prestamo.fecha_vence|date:"d/m/Y" }}</td>
-                    <td>
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="px-6 py-4 font-mono text-xs text-gray-500 font-semibold">#{{ prestamo.prestamo_id }}</td>
+                    <td class="px-6 py-4 font-bold text-gray-900">{{ prestamo.miembro.nombre_completo }}</td>
+                    <td class="px-6 py-4 text-gray-900 font-medium">{{ prestamo.libro.titulo }}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500">{{ prestamo.fecha_salida|date:"d/m/Y" }}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500">{{ prestamo.fecha_vence|date:"d/m/Y" }}</td>
+                    <td class="px-6 py-4 text-xs">
                         {% if prestamo.fecha_dev_real %}
-                            {{ prestamo.fecha_dev_real|date:"d/m/Y" }}
+                            <span class="text-gray-900">{{ prestamo.fecha_dev_real|date:"d/m/Y" }}</span>
                         {% else %}
-                            <span style="color: var(--text-secondary); font-style: italic;">Activo</span>
+                            <span class="text-gray-400 italic">Activo</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="px-6 py-4 text-xs font-semibold">
                         {% if prestamo.dias_mora > 0 %}
-                            <strong style="color: var(--danger);">{{ prestamo.dias_mora }} días</strong>
+                            <span class="text-red-600">{{ prestamo.dias_mora }} días</span>
                         {% else %}
-                            0
+                            <span class="text-gray-400">Ninguna</span>
                         {% endif %}
                     </td>
-                    <td>${{ prestamo.costo_calculado }}</td>
-                    <td>
-                        <span class="badge badge-{{ prestamo.estado_transaccion|lower }}">
+                    <td class="px-6 py-4 font-bold text-gray-900">${{ prestamo.costo_calculado }}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if prestamo.estado_transaccion == 'Devuelto' %} bg-green-50 text-green-800 {% elif prestamo.estado_transaccion == 'Pagado' %} bg-blue-50 text-blue-800 {% elif prestamo.estado_transaccion == 'Vencido' %} bg-red-50 text-red-800 {% else %} bg-yellow-50 text-yellow-800 {% endif %}">
                             {{ prestamo.estado_transaccion }}
                         </span>
                     </td>
-                    <td>
-                        <div style="display: flex; gap: 0.5rem;">
+                    <td class="px-6 py-4 text-right">
+                        <div class="inline-flex gap-2">
                             {% if not prestamo.fecha_dev_real %}
-                                <a href="{% url 'prestamo_return' prestamo.prestamo_id %}" class="btn btn-success btn-sm">↩️ Devolver</a>
+                                <a href="{% url 'prestamo_return' prestamo.prestamo_id %}" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors inline-flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">keyboard_return</span>
+                                    Devolver
+                                </a>
                             {% elif prestamo.estado_transaccion != 'Pagado' and prestamo.costo_calculado > 0 %}
-                                <a href="{% url 'prestamo_pay' prestamo.prestamo_id %}" class="btn btn-primary btn-sm">💵 Cobrar</a>
+                                <a href="{% url 'prestamo_pay' prestamo.prestamo_id %}" class="px-3 py-1.5 bg-primary hover:bg-blue-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors inline-flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">payments</span>
+                                    Cobrar
+                                </a>
                             {% else %}
-                                <span style="color: var(--text-secondary); font-size: 0.85rem;">Completado</span>
+                                <span class="text-xs text-gray-400 italic font-medium px-2 py-1">Completado</span>
                             {% endif %}
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="10" style="text-align: center;">No hay transacciones registradas.</td>
+                    <td colspan="10" class="px-6 py-12 text-center text-gray-500">No hay transacciones registradas.</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -1,50 +1,127 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sistema de Biblioteca{% endblock %}</title>
-    <!-- Google Fonts -->
+    <title>{% block title %}BiblioTech - Sistema de Biblioteca{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Flowbite -->
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+    <!-- Google Fonts & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'biblioteca/css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#004cc7",
+              "primary-container": "#1c64f2",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#f1f2ff",
+              background: "#faf8ff",
+              surface: "#faf8ff",
+              "surface-container": "#ededf9",
+              "surface-container-high": "#e7e7f3",
+              "on-surface": "#191b24",
+              "on-surface-variant": "#424655",
+              "outline-variant": "#c3c6d8",
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body>
-    <header>
-        <div class="nav-container">
-            <div class="logo">
-                <a href="{% url 'dashboard' %}">
-                    <span>📚</span> LibSistema
+<body class="bg-background text-on-surface flex min-h-screen">
+
+    <!-- Sidebar Layout -->
+    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-5 transition-transform -translate-x-full bg-surface-container border-r border-outline-variant lg:translate-x-0 lg:flex lg:flex-col p-4 overflow-y-auto" aria-label="Sidebar">
+        <div class="mb-8 px-4 flex justify-between items-center">
+            <div>
+                <a href="{% url 'dashboard' %}" class="text-2xl font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">menu_book</span>
+                    BiblioTech
                 </a>
+                <p class="text-xs text-on-surface-variant opacity-75 mt-1">Gestión de Biblioteca</p>
             </div>
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Inicio</a></li>
-                    <li><a href="{% url 'libro_list' %}" class="nav-link {% if 'libro' in request.resolver_match.url_name %}active{% endif %}">Libros</a></li>
-                    <li><a href="{% url 'miembro_list' %}" class="nav-link {% if 'miembro' in request.resolver_match.url_name %}active{% endif %}">Miembros</a></li>
-                    <li><a href="{% url 'prestamo_list' %}" class="nav-link {% if 'prestamo' in request.resolver_match.url_name %}active{% endif %}">Préstamos</a></li>
-                </ul>
-            </nav>
+            <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="lg:hidden p-2 text-on-surface-variant rounded-lg hover:bg-surface-container-high">
+                <span class="material-symbols-outlined">close</span>
+            </button>
         </div>
-    </header>
+        
+        <a href="{% url 'prestamo_create' %}" class="mb-8 w-full py-3 px-4 bg-primary hover:bg-blue-800 text-on-primary rounded-lg font-semibold text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 shadow-md">
+            <span class="material-symbols-outlined">add</span>
+            Nuevo Préstamo
+        </a>
 
-    <main>
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
+        <nav class="flex-1 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 {% if request.resolver_match.url_name == 'dashboard' %} bg-primary text-on-primary {% else %} text-on-surface-variant hover:bg-surface-container-high {% endif %}" href="{% url 'dashboard' %}">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 {% if 'libro' in request.resolver_match.url_name %} bg-primary text-on-primary {% else %} text-on-surface-variant hover:bg-surface-container-high {% endif %}" href="{% url 'libro_list' %}">
+                <span class="material-symbols-outlined">library_books</span>
+                Libros
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 {% if 'miembro' in request.resolver_match.url_name %} bg-primary text-on-primary {% else %} text-on-surface-variant hover:bg-surface-container-high {% endif %}" href="{% url 'miembro_list' %}">
+                <span class="material-symbols-outlined">group</span>
+                Miembros
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 {% if 'prestamo' in request.resolver_match.url_name and request.resolver_match.url_name != 'prestamo_create' %} bg-primary text-on-primary {% else %} text-on-surface-variant hover:bg-surface-container-high {% endif %}" href="{% url 'prestamo_list' %}">
+                <span class="material-symbols-outlined">calendar_month</span>
+                Préstamos
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col min-h-screen lg:pl-64">
+        
+        <!-- Header -->
+        <header class="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white border-b border-outline-variant">
+            <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="p-2 text-primary lg:hidden rounded-lg hover:bg-gray-100">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <div class="hidden md:flex relative max-w-md w-full">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                <input class="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full border-0 focus:ring-2 focus:ring-primary text-sm" placeholder="Buscar libros, autores..." type="text"/>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
+                    <span class="material-symbols-outlined text-primary text-lg">person</span>
                 </div>
-            {% endfor %}
-        {% endif %}
+            </div>
+        </header>
 
-        {% block content %}
-        {% endblock %}
-    </main>
+        <!-- Content Area -->
+        <main class="flex-1 p-6 max-w-7xl w-full mx-auto">
+            {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-lg text-sm flex items-center gap-2 {% if message.tags == 'error' %} bg-red-50 text-red-800 {% elif message.tags == 'warning' %} bg-yellow-50 text-yellow-800 {% else %} bg-green-50 text-green-800 {% endif %}">
+                            <span class="material-symbols-outlined text-lg">info</span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-    <footer>
-        <p>&copy; 2026 LibSistema. Pair programmed with Antigravity.</p>
-    </footer>
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="p-6 bg-white border-t border-outline-variant text-center text-xs text-on-surface-variant">
+            <p>&copy; 2026 BiblioTech. Rediseñado con Antigravity & Stitch.</p>
+        </footer>
+    </div>
 </body>
 </html>

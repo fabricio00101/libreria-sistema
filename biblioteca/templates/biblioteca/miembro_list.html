@@ -1,42 +1,54 @@
 {% extends 'biblioteca/base.html' %}
 
-{% block title %}Miembros de la Biblioteca - LibSistema{% endblock %}
+{% block title %}Miembros - BiblioTech{% endblock %}
 
 {% block content %}
-<div class="card-section">
-    <div class="section-header">
-        <h1 class="section-title">Padrones de Miembros</h1>
-        <a href="{% url 'miembro_create' %}" class="btn btn-primary">➕ Registrar Miembro</a>
+<div class="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-gray-150 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-950">Padrón de Miembros</h1>
+            <p class="text-sm text-gray-500 mt-1">Registra y administra los usuarios y lectores del sistema.</p>
+        </div>
+        <a href="{% url 'miembro_create' %}" class="px-4 py-2 bg-primary hover:bg-blue-800 text-white text-sm font-semibold rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-sm">add</span>
+            Registrar Miembro
+        </a>
     </div>
     
-    <div class="table-responsive">
-        <table>
-            <thead>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-600">
+            <thead class="text-xs text-gray-700 bg-gray-50/80 border-b border-gray-150 uppercase tracking-wider">
                 <tr>
-                    <th>ID</th>
-                    <th>Nombre Completo</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                    <th>Acciones</th>
+                    <th class="px-6 py-4 font-semibold">ID Miembro</th>
+                    <th class="px-6 py-4 font-semibold">Nombre Completo</th>
+                    <th class="px-6 py-4 font-semibold">Email</th>
+                    <th class="px-6 py-4 font-semibold">Teléfono</th>
+                    <th class="px-6 py-4 font-semibold text-right">Acciones</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-150">
                 {% for miembro in miembros %}
-                <tr>
-                    <td><code>{{ miembro.miembro_id }}</code></td>
-                    <td><strong>{{ miembro.nombre_completo }}</strong></td>
-                    <td>{{ miembro.email }}</td>
-                    <td>{{ miembro.telefono|default:"-" }}</td>
-                    <td>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <a href="{% url 'miembro_update' miembro.miembro_id %}" class="btn btn-secondary btn-sm">✏️ Editar</a>
-                            <a href="{% url 'miembro_delete' miembro.miembro_id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar a este miembro?');">🗑️ Borrar</a>
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="px-6 py-4 font-mono text-xs text-gray-500 font-semibold">#{{ miembro.miembro_id }}</td>
+                    <td class="px-6 py-4 font-bold text-gray-900">{{ miembro.nombre_completo }}</td>
+                    <td class="px-6 py-4">{{ miembro.email }}</td>
+                    <td class="px-6 py-4 text-gray-500">{{ miembro.telefono|default:"-" }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="inline-flex gap-2">
+                            <a href="{% url 'miembro_update' miembro.miembro_id %}" class="px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-xs font-semibold rounded-lg text-gray-700 transition-colors inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">edit</span>
+                                Editar
+                            </a>
+                            <a href="{% url 'miembro_delete' miembro.miembro_id %}" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-xs font-semibold rounded-lg text-red-650 transition-colors inline-flex items-center gap-1" onclick="return confirm('¿Seguro que deseas eliminar a este miembro?');">
+                                <span class="material-symbols-outlined text-xs">delete</span>
+                                Borrar
+                            </a>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="text-align: center;">No hay miembros registrados en el sistema.</td>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">No hay miembros registrados en el sistema.</td>
                 </tr>
                 {% endfor %}
             </tbody>
