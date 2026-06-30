@@ -1,0 +1,118 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Inicio - LibSistema{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h1 class="section-title">Resumen de la Biblioteca</h1>
+</div>
+
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-info">
+            <h3>Libros en Catálogo</h3>
+            <p>{{ total_libros }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+            <h3>Miembros Activos</h3>
+            <p>{{ total_miembros }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🔄</div>
+        <div class="stat-info">
+            <h3>Préstamos en Curso</h3>
+            <p>{{ total_prestamos_activos }}</p>
+        </div>
+    </div>
+    <div class="stat-card" style="{% if total_vencidos > 0 %}border-color: var(--danger);{% endif %}">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-info">
+            <h3>Préstamos Vencidos</h3>
+            <p style="{% if total_vencidos > 0 %}color: var(--danger);{% endif %}">{{ total_vencidos }}</p>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(45%, 1fr)); gap: 2rem;">
+    <!-- Últimos Préstamos -->
+    <div class="card-section">
+        <div class="section-header">
+            <h2 class="section-title">Últimas Transacciones</h2>
+            <a href="{% url 'prestamo_list' %}" class="btn btn-secondary btn-sm">Ver Todos</a>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Libro</th>
+                        <th>Miembro</th>
+                        <th>Vence</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prestamo in ultimos_prestamos %}
+                    <tr>
+                        <td><strong>{{ prestamo.libro.titulo }}</strong></td>
+                        <td>{{ prestamo.miembro.nombre_completo }}</td>
+                        <td>{{ prestamo.fecha_vence|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge badge-{{ prestamo.estado_transaccion|lower }}">
+                                {{ prestamo.estado_transaccion }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No hay transacciones registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Stock Crítico -->
+    <div class="card-section">
+        <div class="section-header">
+            <h2 class="section-title">Stock Alerta / Crítico</h2>
+            <a href="{% url 'libro_list' %}" class="btn btn-secondary btn-sm">Gestionar Catálogo</a>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Libro</th>
+                        <th>Disponibles</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for libro in libros_criticos %}
+                    <tr>
+                        <td><strong>{{ libro.titulo }}</strong><br><small>{{ libro.autor }}</small></td>
+                        <td>{{ libro.ejemplares_disponibles }} de {{ libro.cantidad_total }}</td>
+                        <td>
+                            {% if libro.ejemplares_disponibles == 0 %}
+                            <span class="badge badge-nostock">Agotado</span>
+                            {% else %}
+                            <span class="badge badge-pendiente">Stock Bajo</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--success);">¡Todos los libros tienen buen stock!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

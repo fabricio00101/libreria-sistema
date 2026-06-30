@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Biblioteca{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'biblioteca/css/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">
+                <a href="{% url 'dashboard' %}">
+                    <span>📚</span> LibSistema
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Inicio</a></li>
+                    <li><a href="{% url 'libro_list' %}" class="nav-link {% if 'libro' in request.resolver_match.url_name %}active{% endif %}">Libros</a></li>
+                    <li><a href="{% url 'miembro_list' %}" class="nav-link {% if 'miembro' in request.resolver_match.url_name %}active{% endif %}">Miembros</a></li>
+                    <li><a href="{% url 'prestamo_list' %}" class="nav-link {% if 'prestamo' in request.resolver_match.url_name %}active{% endif %}">Préstamos</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 LibSistema. Pair programmed with Antigravity.</p>
+    </footer>
+</body>
+</html>

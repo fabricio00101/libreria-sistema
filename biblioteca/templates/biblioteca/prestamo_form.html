@@ -1,0 +1,63 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Nuevo Préstamo - LibSistema{% endblock %}
+
+{% block content %}
+<div class="card-section" style="max-width: 600px; margin: 0 auto;">
+    <div class="section-header">
+        <h1 class="section-title">Registrar Nuevo Préstamo</h1>
+    </div>
+    
+    {% if not miembros %}
+        <div class="alert alert-warning" style="margin-bottom: 1.5rem;">
+            ⚠️ Debes <a href="{% url 'miembro_create' %}" style="color: inherit; text-decoration: underline; font-weight: 600;">registrar al menos un miembro</a> antes de realizar un préstamo.
+        </div>
+    {% elif not libros %}
+        <div class="alert alert-warning" style="margin-bottom: 1.5rem;">
+            ⚠️ No hay <a href="{% url 'libro_create' %}" style="color: inherit; text-decoration: underline; font-weight: 600;">libros con stock disponible</a> para prestar en este momento.
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="miembro">Miembro Solicitante</label>
+            <select id="miembro" name="miembro" class="form-control" required {% if not miembros %}disabled{% endif %}>
+                <option value="">-- Seleccionar Miembro --</option>
+                {% for miembro in miembros %}
+                    <option value="{{ miembro.miembro_id }}">{{ miembro.nombre_completo }} ({{ miembro.email }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="libro">Libro a Prestar</label>
+            <select id="libro" name="libro" class="form-control" required {% if not libros %}disabled{% endif %}>
+                <option value="">-- Seleccionar Libro --</option>
+                {% for libro in libros %}
+                    <option value="{{ libro.isbn }}">
+                        {{ libro.titulo }} - {{ libro.autor }} (${{ libro.tarifa_diaria }}/día) [Disponibles: {{ libro.ejemplares_disponibles }}]
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="dias_prestamo">Período del Préstamo (días)</label>
+            <select id="dias_prestamo" name="dias_prestamo" class="form-control" required>
+                <option value="3">3 días (Corto plazo)</option>
+                <option value="7" selected>7 días (Estándar)</option>
+                <option value="14">14 días (Largo plazo)</option>
+                <option value="30">30 días (Mes completo)</option>
+            </select>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;" {% if not miembros or not libros %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                ⚡ Registrar Préstamo
+            </button>
+            <a href="{% url 'prestamo_list' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

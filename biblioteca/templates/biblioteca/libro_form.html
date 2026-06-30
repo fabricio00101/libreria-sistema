@@ -1,0 +1,40 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}{% if libro %}Editar{% else %}Nuevo{% endif %} Libro - LibSistema{% endblock %}
+
+{% block content %}
+<div class="card-section" style="max-width: 600px; margin: 0 auto;">
+    <div class="section-header">
+        <h1 class="section-title">{% if libro %}Editar{% else %}Registrar Nuevo{% endif %} Libro</h1>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="isbn">ISBN (13 dígitos)</label>
+            <input type="text" id="isbn" name="isbn" class="form-control" placeholder="Ej. 9780142437230" value="{{ libro.isbn }}{{ isbn }}" {% if libro %}readonly style="background-color: var(--bg-accent); cursor: not-allowed;"{% else %}required{% endif %}>
+        </div>
+        <div class="form-group">
+            <label for="titulo">Título de la Obra</label>
+            <input type="text" id="titulo" name="titulo" class="form-control" placeholder="Ej. Don Quijote de la Mancha" value="{{ libro.titulo }}{{ titulo }}" required>
+        </div>
+        <div class="form-group">
+            <label for="autor">Autor / Creador</label>
+            <input type="text" id="autor" name="autor" class="form-control" placeholder="Ej. Miguel de Cervantes" value="{{ libro.autor }}{{ autor }}" required>
+        </div>
+        <div class="form-group">
+            <label for="cantidad_total">Cantidad Total de Copias Físicas</label>
+            <input type="number" id="cantidad_total" name="cantidad_total" class="form-control" min="1" value="{% if libro %}{{ libro.cantidad_total }}{% else %}1{% endif %}" required>
+        </div>
+        <div class="form-group">
+            <label for="tarifa_diaria">Tarifa Diaria por Préstamo ($)</label>
+            <input type="number" id="tarifa_diaria" name="tarifa_diaria" class="form-control" step="0.01" min="0" value="{% if libro %}{{ libro.tarifa_diaria }}{% else %}100.00{% endif %}" required>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Guardar Libro</button>
+            <a href="{% url 'libro_list' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

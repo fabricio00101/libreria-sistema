@@ -1,0 +1,77 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Transacciones de Préstamos - LibSistema{% endblock %}
+
+{% block content %}
+<div class="card-section">
+    <div class="section-header">
+        <h1 class="section-title">Registro de Préstamos</h1>
+        <a href="{% url 'prestamo_create' %}" class="btn btn-primary">➕ Registrar Préstamo</a>
+    </div>
+    
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Miembro</th>
+                    <th>Libro</th>
+                    <th>Fecha Salida</th>
+                    <th>Fecha Vence</th>
+                    <th>Fecha Devolución</th>
+                    <th>Días Mora</th>
+                    <th>Costo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prestamo in prestamos %}
+                <tr>
+                    <td><code>#{{ prestamo.prestamo_id }}</code></td>
+                    <td><strong>{{ prestamo.miembro.nombre_completo }}</strong></td>
+                    <td>{{ prestamo.libro.titulo }}</td>
+                    <td>{{ prestamo.fecha_salida|date:"d/m/Y" }}</td>
+                    <td>{{ prestamo.fecha_vence|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if prestamo.fecha_dev_real %}
+                            {{ prestamo.fecha_dev_real|date:"d/m/Y" }}
+                        {% else %}
+                            <span style="color: var(--text-secondary); font-style: italic;">Activo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if prestamo.dias_mora > 0 %}
+                            <strong style="color: var(--danger);">{{ prestamo.dias_mora }} días</strong>
+                        {% else %}
+                            0
+                        {% endif %}
+                    </td>
+                    <td>${{ prestamo.costo_calculado }}</td>
+                    <td>
+                        <span class="badge badge-{{ prestamo.estado_transaccion|lower }}">
+                            {{ prestamo.estado_transaccion }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            {% if not prestamo.fecha_dev_real %}
+                                <a href="{% url 'prestamo_return' prestamo.prestamo_id %}" class="btn btn-success btn-sm">↩️ Devolver</a>
+                            {% elif prestamo.estado_transaccion != 'Pagado' and prestamo.costo_calculado > 0 %}
+                                <a href="{% url 'prestamo_pay' prestamo.prestamo_id %}" class="btn btn-primary btn-sm">💵 Cobrar</a>
+                            {% else %}
+                                <span style="color: var(--text-secondary); font-size: 0.85rem;">Completado</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" style="text-align: center;">No hay transacciones registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

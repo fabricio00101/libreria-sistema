@@ -1,0 +1,46 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Miembros de la Biblioteca - LibSistema{% endblock %}
+
+{% block content %}
+<div class="card-section">
+    <div class="section-header">
+        <h1 class="section-title">Padrones de Miembros</h1>
+        <a href="{% url 'miembro_create' %}" class="btn btn-primary">➕ Registrar Miembro</a>
+    </div>
+    
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Completo</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for miembro in miembros %}
+                <tr>
+                    <td><code>{{ miembro.miembro_id }}</code></td>
+                    <td><strong>{{ miembro.nombre_completo }}</strong></td>
+                    <td>{{ miembro.email }}</td>
+                    <td>{{ miembro.telefono|default:"-" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'miembro_update' miembro.miembro_id %}" class="btn btn-secondary btn-sm">✏️ Editar</a>
+                            <a href="{% url 'miembro_delete' miembro.miembro_id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar a este miembro?');">🗑️ Borrar</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No hay miembros registrados en el sistema.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
