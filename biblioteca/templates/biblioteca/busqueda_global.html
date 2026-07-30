@@ -1,0 +1,145 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Búsqueda: "{{ query }}" - BiblioTech{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Resultados de Búsqueda</h1>
+    <p class="text-sm text-gray-500 mt-1">Resultados para la consulta: <span class="font-semibold text-gray-900">"{{ query }}"</span></p>
+</div>
+
+<div class="space-y-8">
+    <!-- Libros Encontrados -->
+    <div class="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-gray-150 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">library_books</span>
+                <h2 class="text-lg font-bold text-gray-950">Libros ({{ libros|length }})</h2>
+            </div>
+            <a href="{% url 'libro_list' %}" class="text-xs text-primary hover:underline font-semibold">Ir al Catálogo</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-600">
+                <thead class="text-xs text-gray-700 bg-gray-50/80 border-b border-gray-150 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-4 font-semibold">ISBN</th>
+                        <th class="px-6 py-4 font-semibold">Título</th>
+                        <th class="px-6 py-4 font-semibold">Autor</th>
+                        <th class="px-6 py-4 font-semibold">Tarifa Diaria</th>
+                        <th class="px-6 py-4 font-semibold text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-150">
+                    {% for libro in libros %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4 font-mono text-xs text-gray-500 font-semibold">{{ libro.isbn }}</td>
+                        <td class="px-6 py-4 font-bold text-gray-900">{{ libro.titulo }}</td>
+                        <td class="px-6 py-4">{{ libro.autor }}</td>
+                        <td class="px-6 py-4 font-semibold text-gray-900">${{ libro.tarifa_diaria }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{% url 'libro_update' libro.isbn %}" class="px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-xs font-semibold rounded-lg text-gray-700 transition-colors inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">edit</span>
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">No se encontraron libros.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Miembros Encontrados -->
+    <div class="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-gray-150 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">group</span>
+                <h2 class="text-lg font-bold text-gray-950">Miembros ({{ miembros|length }})</h2>
+            </div>
+            <a href="{% url 'miembro_list' %}" class="text-xs text-primary hover:underline font-semibold">Ir al Padrón</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-600">
+                <thead class="text-xs text-gray-700 bg-gray-50/80 border-b border-gray-150 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-4 font-semibold">ID</th>
+                        <th class="px-6 py-4 font-semibold">Nombre Completo</th>
+                        <th class="px-6 py-4 font-semibold">Email</th>
+                        <th class="px-6 py-4 font-semibold">Teléfono</th>
+                        <th class="px-6 py-4 font-semibold text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-150">
+                    {% for miembro in miembros %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4 font-mono text-xs text-gray-500 font-semibold">#{{ miembro.miembro_id }}</td>
+                        <td class="px-6 py-4 font-bold text-gray-900">{{ miembro.nombre_completo }}</td>
+                        <td class="px-6 py-4">{{ miembro.email }}</td>
+                        <td class="px-6 py-4 text-gray-500">{{ miembro.telefono|default:"-" }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{% url 'miembro_update' miembro.miembro_id %}" class="px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-xs font-semibold rounded-lg text-gray-700 transition-colors inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">edit</span>
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">No se encontraron miembros.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Préstamos Encontrados -->
+    <div class="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-gray-150 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">calendar_month</span>
+                <h2 class="text-lg font-bold text-gray-950">Préstamos ({{ prestamos|length }})</h2>
+            </div>
+            <a href="{% url 'prestamo_list' %}" class="text-xs text-primary hover:underline font-semibold">Ir a Préstamos</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-600">
+                <thead class="text-xs text-gray-700 bg-gray-50/80 border-b border-gray-150 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-4 font-semibold">ID</th>
+                        <th class="px-6 py-4 font-semibold">Miembro</th>
+                        <th class="px-6 py-4 font-semibold">Libro</th>
+                        <th class="px-6 py-4 font-semibold">Salida</th>
+                        <th class="px-6 py-4 font-semibold">Vencimiento</th>
+                        <th class="px-6 py-4 font-semibold">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-150">
+                    {% for prestamo in prestamos %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4 font-mono text-xs text-gray-500 font-semibold">#{{ prestamo.prestamo_id }}</td>
+                        <td class="px-6 py-4 font-bold text-gray-900">{{ prestamo.miembro.nombre_completo }}</td>
+                        <td class="px-6 py-4 text-gray-900 font-medium">{{ prestamo.libro.titulo }}</td>
+                        <td class="px-6 py-4 text-xs text-gray-500">{{ prestamo.fecha_salida|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4 text-xs text-gray-500">{{ prestamo.fecha_vence|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if prestamo.estado_display == 'Devuelto' %} bg-green-50 text-green-800 {% elif prestamo.estado_display == 'Pagado' %} bg-blue-50 text-blue-800 {% elif prestamo.estado_display == 'Vencido' %} bg-red-50 text-red-800 {% else %} bg-yellow-50 text-yellow-800 {% endif %}">
+                                {{ prestamo.estado_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">No se encontraron préstamos.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,6 +3,62 @@
 {% block title %}Préstamos - BiblioTech{% endblock %}
 
 {% block content %}
+<!-- Filtros de Búsqueda -->
+<div class="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 mb-6">
+    <h2 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-gray-400">filter_alt</span>
+        Filtrar Préstamos
+    </h2>
+    <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+        <!-- Filtro Estado -->
+        <div>
+            <label for="estado" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Estado</label>
+            <select name="estado" id="estado" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                <option value="">-- Todos --</option>
+                <option value="Pendiente" {% if estado_filter == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="Pagado" {% if estado_filter == 'Pagado' %}selected{% endif %}>Pagado</option>
+                <option value="Vencido" {% if estado_filter == 'Vencido' %}selected{% endif %}>Vencido</option>
+            </select>
+        </div>
+
+        <!-- Filtro Miembro -->
+        <div>
+            <label for="miembro" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Miembro</label>
+            <select name="miembro" id="miembro" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                <option value="">-- Todos --</option>
+                {% for miembro in miembros %}
+                    <option value="{{ miembro.miembro_id }}" {% if miembro_filter == miembro.miembro_id|stringformat:"s" %}selected{% endif %}>{{ miembro.nombre_completo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Filtro Desde -->
+        <div>
+            <label for="desde" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Desde</label>
+            <input type="date" name="desde" id="desde" value="{{ desde_filter }}" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+        </div>
+
+        <!-- Filtro Hasta -->
+        <div>
+            <label for="hasta" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Hasta</label>
+            <input type="date" name="hasta" id="hasta" value="{{ hasta_filter }}" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="sm:col-span-2 lg:col-span-4 flex justify-end gap-3 mt-2">
+            <a href="{% url 'prestamo_list' %}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-lg transition-colors flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">restart_alt</span>
+                Limpiar
+            </a>
+            <button type="submit" class="px-4 py-2 bg-primary hover:bg-blue-800 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">search</span>
+                Aplicar Filtros
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Listado de Préstamos -->
 <div class="bg-white rounded-2xl border border-gray-150 shadow-sm overflow-hidden">
     <div class="p-6 border-b border-gray-150 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -32,7 +88,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-150">
-                {% for prestamo in prestamos %}
+                {% for prestamo in page_obj %}
                 <tr class="hover:bg-gray-50/50 transition-colors">
                     <td class="px-6 py-4 font-mono text-xs text-gray-500 font-semibold">#{{ prestamo.prestamo_id }}</td>
                     <td class="px-6 py-4 font-bold text-gray-900">{{ prestamo.miembro.nombre_completo }}</td>
@@ -55,22 +111,28 @@
                     </td>
                     <td class="px-6 py-4 font-bold text-gray-900">${{ prestamo.costo_calculado }}</td>
                     <td class="px-6 py-4">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if prestamo.estado_transaccion == 'Devuelto' %} bg-green-50 text-green-800 {% elif prestamo.estado_transaccion == 'Pagado' %} bg-blue-50 text-blue-800 {% elif prestamo.estado_transaccion == 'Vencido' %} bg-red-50 text-red-800 {% else %} bg-yellow-50 text-yellow-800 {% endif %}">
-                            {{ prestamo.estado_transaccion }}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if prestamo.estado_display == 'Devuelto' %} bg-green-50 text-green-800 {% elif prestamo.estado_display == 'Pagado' %} bg-blue-50 text-blue-800 {% elif prestamo.estado_display == 'Vencido' %} bg-red-50 text-red-800 {% else %} bg-yellow-50 text-yellow-800 {% endif %}">
+                            {{ prestamo.estado_display }}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="inline-flex gap-2">
                             {% if not prestamo.fecha_dev_real %}
-                                <a href="{% url 'prestamo_return' prestamo.prestamo_id %}" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors inline-flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-xs">keyboard_return</span>
-                                    Devolver
-                                </a>
-                            {% elif prestamo.estado_transaccion != 'Pagado' and prestamo.costo_calculado > 0 %}
-                                <a href="{% url 'prestamo_pay' prestamo.prestamo_id %}" class="px-3 py-1.5 bg-primary hover:bg-blue-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors inline-flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-xs">payments</span>
-                                    Cobrar
-                                </a>
+                                <form method="POST" action="{% url 'prestamo_return' prestamo.prestamo_id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors inline-flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-xs">keyboard_return</span>
+                                        Devolver
+                                    </button>
+                                </form>
+                            {% elif prestamo.estado_display != 'Pagado' and prestamo.costo_calculado > 0 %}
+                                <form method="POST" action="{% url 'prestamo_pay' prestamo.prestamo_id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1.5 bg-primary hover:bg-blue-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors inline-flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-xs">payments</span>
+                                        Cobrar
+                                    </button>
+                                </form>
                             {% else %}
                                 <span class="text-xs text-gray-400 italic font-medium px-2 py-1">Completado</span>
                             {% endif %}
@@ -85,5 +147,18 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+    <nav class="flex justify-center items-center gap-2 p-4 border-t border-gray-150 bg-gray-50/50">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if estado_filter %}&estado={{ estado_filter }}{% endif %}{% if miembro_filter %}&miembro={{ miembro_filter }}{% endif %}{% if desde_filter %}&desde={{ desde_filter }}{% endif %}{% if hasta_filter %}&hasta={{ hasta_filter }}{% endif %}" class="px-3 py-1 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">Anterior</a>
+        {% endif %}
+        <span class="text-sm text-gray-500">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if estado_filter %}&estado={{ estado_filter }}{% endif %}{% if miembro_filter %}&miembro={{ miembro_filter }}{% endif %}{% if desde_filter %}&desde={{ desde_filter }}{% endif %}{% if hasta_filter %}&hasta={{ hasta_filter }}{% endif %}" class="px-3 py-1 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">Siguiente</a>
+        {% endif %}
+    </nav>
+    {% endif %}
 </div>
 {% endblock %}

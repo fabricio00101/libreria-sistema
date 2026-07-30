@@ -19,7 +19,7 @@
                     <span class="material-symbols-outlined text-lg">search</span>
                 </button>
                 {% if query %}
-                    <a href="{% url 'libro_list' %}" class="px-3 py-2 bg-gray-100 hover:bg-gray-250 text-gray-700 text-sm font-semibold rounded-lg transition-colors">Limpiar</a>
+                    <a href="{% url 'libro_list' %}" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-lg transition-colors">Limpiar</a>
                 {% endif %}
             </form>
             <a href="{% url 'libro_create' %}" class="px-4 py-2 bg-primary hover:bg-blue-800 text-white text-sm font-semibold rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2">
@@ -42,7 +42,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-150">
-                {% for libro in libros %}
+                {% for libro in page_obj %}
                 <tr class="hover:bg-gray-50/50 transition-colors">
                     <td class="px-6 py-4 font-mono text-xs text-gray-500 font-semibold">{{ libro.isbn }}</td>
                     <td class="px-6 py-4 font-bold text-gray-900">{{ libro.titulo }}</td>
@@ -64,13 +64,37 @@
                                 <span class="material-symbols-outlined text-xs">edit</span>
                                 Editar
                             </a>
-                            <a href="{% url 'libro_delete' libro.isbn %}" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-xs font-semibold rounded-lg text-red-650 transition-colors inline-flex items-center gap-1" onclick="return confirm('¿Seguro que deseas eliminar este libro?');">
+                            <button data-modal-target="modal-delete-{{ libro.isbn }}" data-modal-toggle="modal-delete-{{ libro.isbn }}" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-xs font-semibold rounded-lg text-red-650 transition-colors inline-flex items-center gap-1">
                                 <span class="material-symbols-outlined text-xs">delete</span>
                                 Borrar
-                            </a>
+                            </button>
                         </div>
                     </td>
                 </tr>
+
+                <!-- Delete Modal -->
+                <div id="modal-delete-{{ libro.isbn }}" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-gray-900/50">
+                    <div class="relative p-4 w-full max-w-md max-h-full">
+                        <div class="relative bg-white rounded-2xl shadow">
+                            <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="modal-delete-{{ libro.isbn }}">
+                                <span class="material-symbols-outlined text-sm">close</span>
+                            </button>
+                            <div class="p-4 md:p-5 text-center">
+                                <span class="material-symbols-outlined text-red-600 text-5xl mb-4">warning</span>
+                                <h3 class="mb-5 text-lg font-bold text-gray-900">¿Eliminar Libro?</h3>
+                                <p class="text-sm text-gray-500 mb-6">¿Estás seguro de que deseas eliminar el libro "{{ libro.titulo }}"? Esta acción no se puede deshacer.</p>
+                                <div class="flex gap-3 justify-center">
+                                    <form method="POST" action="{% url 'libro_delete' libro.isbn %}" class="flex-1">
+                                        {% csrf_token %}
+                                        <button type="submit" class="w-full px-4 py-2 bg-red-600 hover:bg-red-800 text-white rounded-lg text-sm font-semibold transition-colors">Eliminar</button>
+                                    </form>
+                                    <button data-modal-hide="modal-delete-{{ libro.isbn }}" type="button" class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition-colors">Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {% empty %}
                 <tr>
                     <td colspan="6" class="px-6 py-12 text-center text-gray-500">No hay libros registrados en el inventario.</td>
@@ -79,5 +103,18 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+    <nav class="flex justify-center items-center gap-2 p-4 border-t border-gray-150 bg-gray-50/50">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="px-3 py-1 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">Anterior</a>
+        {% endif %}
+        <span class="text-sm text-gray-500">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="px-3 py-1 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">Siguiente</a>
+        {% endif %}
+    </nav>
+    {% endif %}
 </div>
 {% endblock %}

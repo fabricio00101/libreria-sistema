@@ -1,36 +1,63 @@
 {% extends 'biblioteca/base.html' %}
 
-{% block title %}{% if libro %}Editar{% else %}Nuevo{% endif %} Libro - BiblioTech{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Libro - BiblioTech{% endblock %}
 
 {% block content %}
 <div class="bg-white rounded-2xl border border-gray-150 shadow-sm max-w-2xl mx-auto overflow-hidden">
     <div class="p-6 border-b border-gray-150">
-        <h1 class="text-2xl font-bold text-gray-950">{% if libro %}Editar{% else %}Registrar Nuevo{% endif %} Libro</h1>
+        <h1 class="text-2xl font-bold text-gray-950">{% if form.instance.pk %}Editar{% else %}Registrar Nuevo{% endif %} Libro</h1>
         <p class="text-sm text-gray-500 mt-1">Completa los campos para actualizar o añadir una obra al inventario.</p>
     </div>
     
     <form method="POST" class="p-6 space-y-5">
         {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="p-4 bg-red-50 text-red-800 rounded-lg text-sm flex flex-col gap-1">
+                {% for error in form.non_field_errors %}
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">error</span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <div>
-            <label for="isbn" class="block text-sm font-semibold text-gray-700 mb-1">ISBN (13 dígitos)</label>
-            <input type="text" id="isbn" name="isbn" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary {% if libro %} bg-gray-150 cursor-not-allowed {% endif %}" placeholder="Ej. 9780142437230" value="{{ libro.isbn }}{{ isbn }}" {% if libro %}readonly{% else %}required{% endif %}>
+            <label for="{{ form.isbn.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">ISBN (13 dígitos)</label>
+            {{ form.isbn }}
+            {% if form.isbn.errors %}
+                <p class="text-red-650 text-xs mt-1">{{ form.isbn.errors.0 }}</p>
+            {% endif %}
         </div>
         <div>
-            <label for="titulo" class="block text-sm font-semibold text-gray-700 mb-1">Título de la Obra</label>
-            <input type="text" id="titulo" name="titulo" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Ej. Don Quijote de la Mancha" value="{{ libro.titulo }}{{ titulo }}" required>
+            <label for="{{ form.titulo.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Título de la Obra</label>
+            {{ form.titulo }}
+            {% if form.titulo.errors %}
+                <p class="text-red-650 text-xs mt-1">{{ form.titulo.errors.0 }}</p>
+            {% endif %}
         </div>
         <div>
-            <label for="autor" class="block text-sm font-semibold text-gray-700 mb-1">Autor / Creador</label>
-            <input type="text" id="autor" name="autor" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Ej. Miguel de Cervantes" value="{{ libro.autor }}{{ autor }}" required>
+            <label for="{{ form.autor.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Autor / Creador</label>
+            {{ form.autor }}
+            {% if form.autor.errors %}
+                <p class="text-red-650 text-xs mt-1">{{ form.autor.errors.0 }}</p>
+            {% endif %}
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label for="cantidad_total" class="block text-sm font-semibold text-gray-700 mb-1">Copias Físicas</label>
-                <input type="number" id="cantidad_total" name="cantidad_total" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary" min="1" value="{% if libro %}{{ libro.cantidad_total }}{% else %}1{% endif %}" required>
+                <label for="{{ form.cantidad_total.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Copias Físicas</label>
+                {{ form.cantidad_total }}
+                {% if form.cantidad_total.errors %}
+                    <p class="text-red-650 text-xs mt-1">{{ form.cantidad_total.errors.0 }}</p>
+                {% endif %}
             </div>
             <div>
-                <label for="tarifa_diaria" class="block text-sm font-semibold text-gray-700 mb-1">Tarifa Diaria ($)</label>
-                <input type="number" id="tarifa_diaria" name="tarifa_diaria" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary" step="0.01" min="0" value="{% if libro %}{{ libro.tarifa_diaria }}{% else %}100.00{% endif %}" required>
+                <label for="{{ form.tarifa_diaria.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Tarifa Diaria ($)</label>
+                {{ form.tarifa_diaria }}
+                {% if form.tarifa_diaria.errors %}
+                    <p class="text-red-650 text-xs mt-1">{{ form.tarifa_diaria.errors.0 }}</p>
+                {% endif %}
             </div>
         </div>
         

@@ -10,54 +10,57 @@
     </div>
     
     <div class="p-6 space-y-5">
-        {% if not miembros %}
+        {% if form.non_field_errors %}
+            <div class="p-4 bg-red-50 text-red-800 rounded-lg text-sm flex flex-col gap-1">
+                {% for error in form.non_field_errors %}
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">error</span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if not form.fields.miembro.queryset.exists %}
             <div class="p-4 bg-yellow-50 text-yellow-800 rounded-lg text-sm flex items-center gap-2">
                 <span class="material-symbols-outlined text-lg">warning</span>
                 <span>Debes <a href="{% url 'miembro_create' %}" class="underline font-semibold">registrar al menos un miembro</a> antes de realizar un préstamo.</span>
             </div>
-        {% elif not libros %}
+        {% elif not form.fields.libro.queryset.exists %}
             <div class="p-4 bg-yellow-50 text-yellow-800 rounded-lg text-sm flex items-center gap-2">
                 <span class="material-symbols-outlined text-lg">warning</span>
-                <span>No hay <a href="{% url 'libro_create' %}" class="underline font-semibold">libros con stock disponible</a> para prestar en este momento.</span>
+                <span>No hay libros con stock disponible para prestar en este momento.</span>
             </div>
         {% endif %}
 
         <form method="POST" class="space-y-5">
             {% csrf_token %}
             <div>
-                <label for="miembro" class="block text-sm font-semibold text-gray-700 mb-1">Miembro Solicitante</label>
-                <select id="miembro" name="miembro" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary {% if not miembros %} bg-gray-50 cursor-not-allowed {% endif %}" required {% if not miembros %}disabled{% endif %}>
-                    <option value="">-- Seleccionar Miembro --</option>
-                    {% for miembro in miembros %}
-                        <option value="{{ miembro.miembro_id }}">{{ miembro.nombre_completo }} ({{ miembro.email }})</option>
-                    {% endfor %}
-                </select>
+                <label for="{{ form.miembro.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Miembro Solicitante</label>
+                {{ form.miembro }}
+                {% if form.miembro.errors %}
+                    <p class="text-red-650 text-xs mt-1">{{ form.miembro.errors.0 }}</p>
+                {% endif %}
             </div>
             
             <div>
-                <label for="libro" class="block text-sm font-semibold text-gray-700 mb-1">Libro a Prestar</label>
-                <select id="libro" name="libro" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary {% if not libros %} bg-gray-50 cursor-not-allowed {% endif %}" required {% if not libros %}disabled{% endif %}>
-                    <option value="">-- Seleccionar Libro --</option>
-                    {% for libro in libros %}
-                        <option value="{{ libro.isbn }}">
-                            {{ libro.titulo }} - {{ libro.autor }} (${{ libro.tarifa_diaria }}/día) [Disponibles: {{ libro.ejemplares_disponibles }}]
-                        </option>
-                    {% endfor %}
-                </select>
+                <label for="{{ form.libro.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Libro a Prestar</label>
+                {{ form.libro }}
+                {% if form.libro.errors %}
+                    <p class="text-red-650 text-xs mt-1">{{ form.libro.errors.0 }}</p>
+                {% endif %}
             </div>
             
             <div>
-                <label for="dias_prestamo" class="block text-sm font-semibold text-gray-700 mb-1">Período del Préstamo</label>
-                <select id="dias_prestamo" name="dias_prestamo" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary" required>
-                    <option value="3">3 días (Corto plazo)</option>
-                    <option value="7" selected>7 días (Estándar)</option>
-                    <option value="14">14 días (Largo plazo)</option>
-                    <option value="30">30 días (Mes completo)</option>
-                </select>
+                <label for="{{ form.dias_prestamo.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Período del Préstamo</label>
+                {{ form.dias_prestamo }}
+                {% if form.dias_prestamo.errors %}
+                    <p class="text-red-650 text-xs mt-1">{{ form.dias_prestamo.errors.0 }}</p>
+                {% endif %}
             </div>
             
             <div class="flex items-center gap-3 pt-4 border-t border-gray-150">
-                <button type="submit" class="flex-1 px-4 py-2.5 bg-primary hover:bg-blue-800 text-white font-semibold text-sm rounded-lg shadow-sm transition-colors text-center disabled:opacity-50 disabled:cursor-not-allowed" {% if not miembros or not libros %}disabled{% endif %}>
+                <button type="submit" class="flex-1 px-4 py-2.5 bg-primary hover:bg-blue-800 text-white font-semibold text-sm rounded-lg shadow-sm transition-colors text-center disabled:opacity-50 disabled:cursor-not-allowed" {% if not form.fields.miembro.queryset.exists or not form.fields.libro.queryset.exists %}disabled{% endif %}>
                     Registrar Préstamo
                 </button>
                 <a href="{% url 'prestamo_list' %}" class="flex-1 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 font-semibold text-sm rounded-lg text-gray-700 text-center transition-colors">

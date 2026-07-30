@@ -1,27 +1,48 @@
 {% extends 'biblioteca/base.html' %}
 
-{% block title %}{% if miembro %}Editar{% else %}Nuevo{% endif %} Miembro - BiblioTech{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Miembro - BiblioTech{% endblock %}
 
 {% block content %}
 <div class="bg-white rounded-2xl border border-gray-150 shadow-sm max-w-2xl mx-auto overflow-hidden">
     <div class="p-6 border-b border-gray-150">
-        <h1 class="text-2xl font-bold text-gray-950">{% if miembro %}Editar{% else %}Registrar Nuevo{% endif %} Miembro</h1>
+        <h1 class="text-2xl font-bold text-gray-950">{% if form.instance.pk %}Editar{% else %}Registrar Nuevo{% endif %} Miembro</h1>
         <p class="text-sm text-gray-500 mt-1">Ingresa la información básica de contacto para registrar o actualizar al lector.</p>
     </div>
     
     <form method="POST" class="p-6 space-y-5">
         {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="p-4 bg-red-50 text-red-800 rounded-lg text-sm flex flex-col gap-1">
+                {% for error in form.non_field_errors %}
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">error</span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <div>
-            <label for="nombre_completo" class="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
-            <input type="text" id="nombre_completo" name="nombre_completo" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Ej. Juan Pérez" value="{{ miembro.nombre_completo }}{{ nombre_completo }}" required>
+            <label for="{{ form.nombre_completo.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
+            {{ form.nombre_completo }}
+            {% if form.nombre_completo.errors %}
+                <p class="text-red-650 text-xs mt-1">{{ form.nombre_completo.errors.0 }}</p>
+            {% endif %}
         </div>
         <div>
-            <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Correo Electrónico</label>
-            <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Ej. juan.perez@example.com" value="{{ miembro.email }}{{ email }}" required>
+            <label for="{{ form.email.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Correo Electrónico</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <p class="text-red-650 text-xs mt-1">{{ form.email.errors.0 }}</p>
+            {% endif %}
         </div>
         <div>
-            <label for="telefono" class="block text-sm font-semibold text-gray-700 mb-1">Teléfono de Contacto</label>
-            <input type="text" id="telefono" name="telefono" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Ej. +54 9 11 2233-4455" value="{{ miembro.telefono }}{{ telefono }}">
+            <label for="{{ form.telefono.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Teléfono de Contacto</label>
+            {{ form.telefono }}
+            {% if form.telefono.errors %}
+                <p class="text-red-650 text-xs mt-1">{{ form.telefono.errors.0 }}</p>
+            {% endif %}
         </div>
         
         <div class="flex items-center gap-3 pt-4 border-t border-gray-150">

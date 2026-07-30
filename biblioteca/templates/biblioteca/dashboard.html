@@ -82,8 +82,8 @@
                         <td class="px-6 py-4">{{ prestamo.miembro.nombre_completo }}</td>
                         <td class="px-6 py-4 text-xs">{{ prestamo.fecha_vence|date:"d/m/Y" }}</td>
                         <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if prestamo.estado_transaccion == 'Devuelto' %} bg-green-50 text-green-800 {% elif prestamo.estado_transaccion == 'Pagado' %} bg-blue-50 text-blue-800 {% elif prestamo.estado_transaccion == 'Vencido' %} bg-red-50 text-red-800 {% else %} bg-yellow-50 text-yellow-800 {% endif %}">
-                                {{ prestamo.estado_transaccion }}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if prestamo.estado_display == 'Devuelto' %} bg-green-50 text-green-800 {% elif prestamo.estado_display == 'Pagado' %} bg-blue-50 text-blue-800 {% elif prestamo.estado_display == 'Vencido' %} bg-red-50 text-red-800 {% else %} bg-yellow-50 text-yellow-800 {% endif %}">
+                                {{ prestamo.estado_display }}
                             </span>
                         </td>
                     </tr>

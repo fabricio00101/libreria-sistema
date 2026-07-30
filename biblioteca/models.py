@@ -63,6 +63,27 @@ class Prestamo(models.Model):
             return (limite_comparacion - self.fecha_vence).days
         return 0
 
+    @property
+    def esta_vencido(self):
+        if self.fecha_dev_real:
+            return self.fecha_dev_real > self.fecha_vence
+        return date.today() > self.fecha_vence
+
+    @property
+    def esta_activo(self):
+        return self.fecha_dev_real is None
+
+    @property
+    def estado_display(self):
+        if self.estado_transaccion == 'Pagado':
+            return 'Pagado'
+        if self.esta_vencido:
+            return 'Vencido'
+        if self.esta_activo:
+            return 'Pendiente'
+        return 'Devuelto'
+
+
     def calcular_costo_y_actualizar_estado(self, multa_diaria=50.00):
         """
         Calcula el costo del préstamo.
